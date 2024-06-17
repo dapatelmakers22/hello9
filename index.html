@@ -1,0 +1,210 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hello9</title>
+    <style>
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #invoice, #invoice * {
+                visibility: visible;
+            }
+            #invoice {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            /* Add any additional styling for the printable invoice here */
+        }
+        
+        /* CSS for table and form */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        input[type="text"],
+        input[type="number"] {
+            width: calc(100% - 16px);
+            padding: 6px;
+        }
+
+        input[type="text"][readonly],
+        input[type="number"][readonly] {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1 align="center">INVOICE</h1>
+    <form id="billingForm" onsubmit="createInvoice(event)">
+        <label for="buyerName">Buyer Name:</label>
+        <input type="text" id="buyerName" required><br><br>
+        
+        <label for="buyerMobile">Buyer Mobile Number:</label>
+        <input type="tel" id="buyerMobile" pattern="[0-9]{10}" required><br><br>
+        
+        <table id="invoiceTable">
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="text" name="itemName[]" required></td>
+                    <td><input type="number" name="quantity[]" min="1" required onchange="calculateItemTotal(this)"></td>
+                    <td><input type="number" name="price[]" min="0" step="0.01" required onchange="calculateItemTotal(this)"></td>
+                    <td><input type="text" name="total[]" readonly></td>
+                    <td><button type="button" onclick="removeItem(this)">Remove</button></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <button type="button" onclick="addItem()">Add Item</button><br><br>
+        
+        <label for="grandTotal">Grand Total:</label>
+        <input type="text" id="grandTotal" readonly><br><br>
+        
+        <button type="submit">Create Invoice</button>
+    </form>
+    
+    <!-- Printable invoice layout -->
+    <div id="invoice" style="display: none;">
+        
+	<h1>Invoice</h1>
+        <p>Buyer Name: <span id="printedBuyerName"></span></p>
+        <p>Buyer Mobile Number: <span id="printedBuyerMobile"></span></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody id="printedItems"></tbody>
+        </table>
+        <p align="right"><b><font size="4">Grand Total: Rs.<span id="printedGrandTotal"></span></font></b></p>
+    </div>
+    
+    <script>
+        function addItem() {
+            var invoiceTable = document.getElementById('invoiceTable').getElementsByTagName('tbody')[0];
+            var newRow = invoiceTable.insertRow();
+            newRow.innerHTML = `
+                <td><input type="text" name="itemName[]" required></td>
+                <td><input type="number" name="quantity[]" min="1" required onchange="calculateItemTotal(this)"></td>
+                <td><input type="number" name="price[]" min="0" step="0.01" required onchange="calculateItemTotal(this)"></td>
+                <td><input type="text" name="total[]" readonly></td>
+                <td><button type="button" onclick="removeItem(this)">Remove</button></td>
+            `;
+        }
+        
+        function calculateItemTotal(input) {
+            var row = input.parentElement.parentElement;
+            var quantity = parseInt(row.cells[1].getElementsByTagName('input')[0].value);
+            var price = parseFloat(row.cells[2].getElementsByTagName('input')[0].value);
+            var total = quantity * price;
+            row.cells[3].getElementsByTagName('input')[0].value = total.toFixed(2);
+            calculateGrandTotal();
+        }
+        
+        function calculateGrandTotal() {
+            var invoiceTable = document.getElementById('invoiceTable').getElementsByTagName('tbody')[0];
+            var grandTotal = 0;
+            for (var i = 0; i < invoiceTable.rows.length; i++) {
+                grandTotal += parseFloat(invoiceTable.rows[i].cells[3].getElementsByTagName('input')[0].value);
+            }
+            document.getElementById('grandTotal').value = grandTotal.toFixed(2);
+        }
+        
+        function removeItem(button) {
+            var row = button.parentElement.parentElement;
+            row.parentElement.removeChild(row);
+            calculateGrandTotal();
+        }
+
+        function createInvoice(event) {
+            // Prevent default form submission
+            event.preventDefault();
+
+            // Get billing information
+            var buyerName = document.getElementById('buyerName').value;
+            var buyerMobile = document.getElementById('buyerMobile').value;
+            var invoiceTable = document.getElementById('invoiceTable').getElementsByTagName('tbody')[0];
+            var items = [];
+            for (var i = 0; i < invoiceTable.rows.length; i++) {
+                var itemName = invoiceTable.rows[i].cells[0].getElementsByTagName('input')[0].value;
+                var quantity = parseInt(invoiceTable.rows[i].cells[1].getElementsByTagName('input')[0].value);
+                var price = parseFloat(invoiceTable.rows[i].cells[2].getElementsByTagName('input')[0].value);
+                var total = parseFloat(invoiceTable.rows[i].cells[3].getElementsByTagName('input')[0].value);
+                items.push({name: itemName, quantity: quantity, price: price, total: total});
+            }
+            var grandTotal = parseFloat(document.getElementById('grandTotal').value);
+
+            // Display invoice
+            document.getElementById('printedBuyerName').textContent = buyerName;
+            document.getElementById('printedBuyerMobile').textContent = buyerMobile;
+            var printedItemsDiv = document.getElementById('printedItems');
+            printedItemsDiv.innerHTML = '';
+            items.forEach(function(item) {
+                var row = printedItemsDiv.insertRow();
+                row.insertCell(0).textContent = item.name;
+                row.insertCell(1).textContent = item.quantity;
+                row.insertCell(2).textContent = 'Rs.' + item.price.toFixed(2);
+                row.insertCell(3).textContent = 'Rs.' + item.total.toFixed(2);
+            });
+            document.getElementById('printedGrandTotal').textContent = grandTotal.toFixed(2);
+            document.getElementById('invoice').style.display = 'block';
+
+            // Print invoice
+            window.print();
+            
+            // Optional: Reset form fields after creating invoice
+            cancelBilling();
+        }
+
+        function cancelBilling() {
+            document.getElementById('billingForm').reset();
+            document.getElementById('grandTotal').value = '';
+            var invoiceTable = document.getElementById('invoiceTable').getElementsByTagName('tbody')[0];
+            while (invoiceTable.rows.length > 1) {
+                invoiceTable.deleteRow(1);
+            }
+        }
+    </script>
+		
+</body>
+</html>
