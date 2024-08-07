@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>hello9.1.0</title>
+    <title>hello9</title>
     <style>
         @media print {
             body * {
@@ -19,6 +19,9 @@
             }
         }
 
+	input {
+			background-color: #b5d8e1;
+	      }	 
         table {
             width: 100%;
             border-collapse: collapse;
@@ -32,46 +35,56 @@
         }
 
         th {
-            background-color: #f2f2f2;
+            background-color: #00a2ff;
         }
         
         input[type="text"],
         input[type="number"],
         input[type="tel"] {
-            width: calc(100% - 16px);
+            width: calc(50% - 16px);
             padding: 6px;
         }
 
         input[type="text"][readonly],
         input[type="number"][readonly] {
-            background-color: #f2f2f2;
+            background-color: #b5d8e1;
         }
 
         button {
             padding: 8px 16px;
-            background-color: #4CAF50;
+            background-color: #c60000;
             color: white;
             border: none;
             cursor: pointer;
         }
 
         button:hover {
-            background-color: #45a049;
+            background-color: #c60000;
         }
     </style>
 </head>
-<body>
-    <h1 align="center">INVOICE</h1>
+<body bgcolor="#3f7acc">
+    <h1 align="center"><font face="Segoe Print"><b>INVOICE</b></font></h1>
     <form id="billingForm" onsubmit="createInvoice(event)">
-        <label for="sellerName">Seller:</label>
-        <input type="text" id="sellerName" required><br><br>
-
-        <label for="buyerName">Buyer Name:</label>
-        <input type="text" id="buyerName" required><br><br>
-        
-        <label for="buyerMobile">Buyer Mobile Number:</label>
-        <input type="tel" id="buyerMobile" pattern="[0-9]{10}" required><br><br>
-        
+	<hr>
+	<table>
+	<tr>        
+	<td>
+	<label for="sellerName">Seller Name:</label>
+        </td><td><input type="text" style="text-align:center;" id="sellerName" required><br><br>
+	</td>
+	</tr>
+        <tr>
+	<td>
+	<label for="buyerName">Buyer Name:</label>
+        </td><td><input type="text" style="text-align:center;" id="buyerName" required><br><br>
+        </td>
+        <tr>
+	<td>
+	<label for="buyerMobile">Buyer Mobile Number:</label>
+        </td><td><input type="tel" style="text-align:center;" id="buyerMobile" pattern="[0-9]{10}" required><br><br>
+        </td>
+	<tr>
         <table id="invoiceTable">
             <thead>
                 <tr>
@@ -84,30 +97,30 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><input type="text" name="itemName[]" required></td>
-                    <td><input type="number" name="quantity[]" min="1" required onchange="calculateItemTotal(this)"></td>
-                    <td><input type="number" name="price[]" min="0" step="0.01" required onchange="calculateItemTotal(this)"></td>
-                    <td><input type="text" name="total[]" readonly></td>
+                    <td><input type="text" style="text-align:center;" name="itemName[]" required></td>
+                    <td><input type="number" style="text-align:center;" name="quantity[]" min="1" required onchange="calculateItemTotal(this)"></td>
+                    <td><input type="number" style="text-align:center;" name="price[]" min="0" step="0.01" required onchange="calculateItemTotal(this)"></td>
+                    <td><input type="text" style="text-align:center;" name="total[]" readonly></td>
                     <td><button type="button" onclick="removeItem(this)">Remove</button></td>
                 </tr>
             </tbody>
         </table>
         
-        <button type="button" onclick="addItem()">Add Item</button><br><br>
+        <center><button type="button" onclick="addItem()">Add Item</button></center><br><br>
         
-        <label for="grandTotal">Grand Total:</label>
-        <input type="text" id="grandTotal" readonly><br><br>
-        
-        <button type="submit">Create Invoice</button>
+       <center> <label for="grandTotal">Grand Total:</label><br>
+        <input type="text" style="text-align:center;" id="grandTotal" readonly><br><br>
+        </center>
+        <center><button type="submit">Create Invoice</button></center>
     </form>
     
     <!-- Printable invoice layout -->
     <div id="invoice" style="display: none;">
-        <h1>Invoice</h1>
-        <p>Seller: <span id="printedSellerName"></span></p>
-        <p>Buyer Name: <span id="printedBuyerName"></span></p>
-        <p>Buyer Mobile Number: <span id="printedBuyerMobile"></span></p>
-        <p>Date and Time: <span id="printedDateTime"></span></p>
+        <h1 align="center"><font face="Segoe Print"><b>INVOICE</b></font></h1>
+        <p> Seller Name: <span id="printedSellerName"></span></p>
+        <p> Buyer Name: <span id="printedBuyerName"></span></p>
+        <p> Buyer Mobile Number: <span id="printedBuyerMobile"></span></p>
+        <p> Date and Time: <span id="printedDateTime"></span></p>
         <table>
             <thead>
                 <tr>
